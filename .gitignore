@@ -1,0 +1,29 @@
+# Terraform files
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfstate
+terraform.tfstate.backup
+*.tfvars.backup
+*.tfvars.json
+*.tfvars.local
+*.lock.hcl
+
+# Secrets and credentials
+*.pem
+*.key
+*.secret
+#*.tfvars  # Comment out if terraform.tfvars is needed in repo
+
+# Local and temporary files
+*.log
+*.bak
+*.swp
+.DS_Store
+.vscode/
+.idea/
+*.iml
+
+# CI/CD and build artifacts
+*.zip
+*.tar.gz
