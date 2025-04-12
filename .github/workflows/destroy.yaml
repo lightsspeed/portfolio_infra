@@ -1,0 +1,50 @@
+name: Terraform Destroy
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_destroy:
+        description: 'Type "destroy" to confirm resource deletion'
+        required: true
+        default: ""
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    environment: destroy-approval
+    if: github.event.inputs.confirm_destroy == 'destroy'
+
+    # env:
+    #   TF_VAR_region: "ap-south-1"
+    #   TF_VAR_domain: "${{ secrets.TF_VAR_domain }}"
+    #   TF_VAR_key_name: "deploy-key"
+    #   TF_VAR_vpc_cidr: "10.0.0.0/16"
+    #   TF_VAR_state_bucket: "example-tf-state"
+    #   TF_VAR_lock_table: "new-terraform-locks"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Init
+        run: terraform init
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Terraform Plan Destroy
+        run: terraform plan -destroy -out=tfplan-destroy
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Terraform Destroy
+        run: terraform apply -auto-approve tfplan-destroy
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
